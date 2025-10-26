@@ -3,23 +3,44 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 
 import { useAuthStore } from "../store/useAuthStore";
+import toast from "react-hot-toast";
 
 
 const SignUpPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
-    fullN: "",
+    fullname: "",
     password: "",
   });
 
   const {signup, isSigningUp} = useAuthStore();
 
-  const validateForm = () => {}
+  const validateForm = () => {
+    const { email, fullname, password } = formData;
+    if(!fullname) {
+      return toast.error("Full name is required");
+    }
+    if(!email) {
+      return toast.error("Email is required");
+    }
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return toast.error("Email is invalid");
+    }
+    if(!password) {
+      return toast.error("Password is required");
+    }
+    if(password.length < 6) {
+      return toast.error("Password must be at least 6 characters");
+    }
+    return true;
+  }
 
   const handleSubmit = (e) => {
   e.preventDefault();
-  }
+ const success = validateForm();
+  if (success == true) signup(formData);
+  };
 
 
   return(
@@ -34,40 +55,34 @@ const SignUpPage = () => {
 <p>get started with your new account</p>
  <form onSubmit={handleSubmit}>
         <div>
-          <label htmlFor="email">Email</label>
+          <label htmlFor="email" className="block mb-2">Email</label>
           <Mail />
           <input
             type="email"
             id="email"
             value={formData.email}
             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-            required
+            
           />
         </div>
         <div>
-          <label htmlFor="fullName">fullName
-
-          </label>
+          <label className="block mb-2" htmlFor="fullname">Full Name</label>
           <input
             type="text"
-            id="fullName
-"
-            value={formData.fullName
-  
-            }
-            onChange={(e) => setFormData({ ...formData, fullName
-  : e.target.value })}
-            required
+            id="fullname"
+            value={formData.fullname}
+            onChange={(e) => setFormData({ ...formData, fullname: e.target.value })}
+            
           />
         </div>
         <div>
-          <label htmlFor="password">Password</label>
+          <label className="block mb-2" htmlFor="password">Password</label>
           <input
             type={showPassword ? "text" : "password"}
             id="password"
             value={formData.password}
             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-            required
+             
           />
           <button type="button" onClick={() => setShowPassword(!showPassword)}>
             {showPassword ? (<EyeOff />) : (<Eye />)} 
